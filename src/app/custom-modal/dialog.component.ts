@@ -5,7 +5,6 @@ import {
   AfterViewInit,
   ComponentRef,
   ViewChild,
-  ComponentFactoryResolver,
   ChangeDetectorRef,
 } from '@angular/core';
 import { Subject } from 'rxjs';
@@ -25,11 +24,7 @@ export class DialogComponent implements AfterViewInit, OnDestroy {
   private readonly _onClose = new Subject<any>();
   public onClose = this._onClose.asObservable();
 
-  constructor(
-    private componentFactoryResolver: ComponentFactoryResolver,
-    private cd: ChangeDetectorRef,
-    private dialogRef: DialogRef
-  ) {}
+  constructor(private cd: ChangeDetectorRef, private dialogRef: DialogRef) {}
 
   ngAfterViewInit(): void {
     this.loadChildComponent(this.childComponentType);
@@ -51,13 +46,10 @@ export class DialogComponent implements AfterViewInit, OnDestroy {
   }
 
   loadChildComponent(componentType: Type<any>): void {
-    let componentFactory =
-      this.componentFactoryResolver.resolveComponentFactory(componentType);
-
     let viewContainerRef = this.insertionPoint!.viewContainerRef;
     viewContainerRef.clear();
 
-    this.componentRef = viewContainerRef.createComponent(componentFactory);
+    this.componentRef = viewContainerRef.createComponent(componentType);
   }
 
   close(): void {
