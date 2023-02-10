@@ -25,7 +25,7 @@ export class DialogService {
   public open(componentType: Type<any>, config: DialogConfig): DialogRef {
     const dialogRef = this.appendDialogComponentToBody(config);
 
-    this.dialogComponentRef.instance.childComponentType = componentType;
+    this.dialogComponentRef.setInput('childComponentType', componentType);
 
     return dialogRef;
   }
@@ -53,10 +53,6 @@ export class DialogService {
     this.document.body.appendChild(componentRef.location.nativeElement);
 
     this.dialogComponentRef = componentRef;
-
-    this.dialogComponentRef.instance.onClose.subscribe(() => {
-      this.removeDialogComponentFromBody();
-    });
 
     return dialogRef;
   }

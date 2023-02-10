@@ -10,8 +10,8 @@ import { DialogRef } from './dialog-ref';
       <p>{{ config.data.message }}</p>
     </div>
     <div class="actions">
-      <button class="button" (click)="onClose()">CANCEL</button>
-      <button class="button" (click)="onClose()">OK</button>
+      <button class="button" (click)="onClose('cancel')">CANCEL</button>
+      <button class="button" (click)="onClose('ok')">OK</button>
     </div>
   `,
   styles: [
@@ -44,7 +44,7 @@ import { DialogRef } from './dialog-ref';
 export class HelloComponent {
   constructor(public config: DialogConfig, public dialog: DialogRef) {}
 
-  onClose(): void {
-    this.dialog.close('some value');
+  onClose(value: string): void {
+    this.dialog.close(value);
   }
 }

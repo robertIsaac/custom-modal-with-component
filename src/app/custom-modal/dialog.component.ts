@@ -5,9 +5,8 @@ import {
   AfterViewInit,
   ComponentRef,
   ViewChild,
-  ChangeDetectorRef,
+  ChangeDetectorRef, Input,
 } from '@angular/core';
-import { Subject } from 'rxjs';
 import { InsertionDirective } from './insertion.directive';
 import { DialogRef } from './dialog-ref';
 
@@ -16,14 +15,11 @@ import { DialogRef } from './dialog-ref';
   styleUrls: ['./dialog.component.scss'],
 })
 export class DialogComponent implements AfterViewInit, OnDestroy {
-  componentRef!: ComponentRef<any>;
-  childComponentType!: Type<any>;
+  @Input() childComponentType!: Type<any>;
 
-  @ViewChild(InsertionDirective) insertionPoint?: InsertionDirective;
+  @ViewChild(InsertionDirective) private insertionPoint!: InsertionDirective;
 
-  private readonly _onClose = new Subject<any>();
-  public onClose = this._onClose.asObservable();
-
+  private componentRef!: ComponentRef<unknown>;
   constructor(private cd: ChangeDetectorRef, private dialogRef: DialogRef) {}
 
   ngAfterViewInit(): void {
@@ -32,21 +28,15 @@ export class DialogComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.componentRef) {
-      this.componentRef.destroy();
-    }
+    this.componentRef.destroy();
   }
 
-  onOverlayClicked(): void {
-    this.dialogRef.close();
+  protected onOverlayClicked(): void {
+    this.dialogRef.close('overlay');
   }
 
-  onDialogClicked(evt: MouseEvent): void {
-    evt.stopPropagation();
-  }
-
-  loadChildComponent(componentType: Type<any>): void {
-    let viewContainerRef = this.insertionPoint!.viewContainerRef;
+  private loadChildComponent(componentType: Type<unknown>): void {
+    let viewContainerRef = this.insertionPoint.viewContainerRef;
     viewContainerRef.clear();
 
     this.componentRef = viewContainerRef.createComponent(componentType);
