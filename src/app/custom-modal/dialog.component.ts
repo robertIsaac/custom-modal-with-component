@@ -37,7 +37,7 @@ export class DialogComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  onOverlayClicked(evt: MouseEvent): void {
+  onOverlayClicked(): void {
     this.dialogRef.close();
   }
 
@@ -50,9 +50,5 @@ export class DialogComponent implements AfterViewInit, OnDestroy {
     viewContainerRef.clear();
 
     this.componentRef = viewContainerRef.createComponent(componentType);
-  }
-
-  close(): void {
-    this._onClose.next(1);
   }
 }

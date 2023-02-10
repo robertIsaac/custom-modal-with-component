@@ -1,17 +1,14 @@
 import {
   Injectable,
-  ComponentFactoryResolver,
   ApplicationRef,
-  Injector,
-  EmbeddedViewRef,
   ComponentRef,
-  Type,
+  Type, createComponent, EnvironmentInjector, Inject, createEnvironmentInjector,
 } from '@angular/core';
 import { DialogModule } from './dialog.module';
 import { DialogComponent } from './dialog.component';
 import { DialogConfig } from './dialog-config';
-import { DialogInjector } from './dialog-injector';
 import { DialogRef } from './dialog-ref';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: DialogModule,
@@ -20,9 +17,9 @@ export class DialogService {
   dialogComponentRef!: ComponentRef<DialogComponent>;
 
   constructor(
-    private componentFactoryResolver: ComponentFactoryResolver,
     private appRef: ApplicationRef,
-    private injector: Injector
+    private injector: EnvironmentInjector,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   public open(componentType: Type<any>, config: DialogConfig): DialogRef {
@@ -34,28 +31,26 @@ export class DialogService {
   }
 
   private appendDialogComponentToBody(config: DialogConfig): DialogRef {
-    const map = new WeakMap();
-    map.set(DialogConfig, config);
-
     const dialogRef = new DialogRef();
-    map.set(DialogRef, dialogRef);
 
     const sub = dialogRef.afterClosed.subscribe(() => {
       // close the dialog
       this.removeDialogComponentFromBody();
       sub.unsubscribe();
     });
-
-    const componentFactory =
-      this.componentFactoryResolver.resolveComponentFactory(DialogComponent);
-    const componentRef = componentFactory.create(
-      new DialogInjector(this.injector, map)
-    );
+    const environmentInjector = createEnvironmentInjector([
+      {
+        provide: DialogRef,
+        useValue: dialogRef,
+      },
+      {
+        provide: DialogConfig,
+        useValue: config,
+      },
+    ], this.injector);
+    const componentRef = createComponent(DialogComponent, {environmentInjector});
     this.appRef.attachView(componentRef.hostView);
-
-    const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
-      .rootNodes[0] as HTMLElement;
-    document.body.appendChild(domElem);
+    this.document.body.appendChild(componentRef.location.nativeElement);
 
     this.dialogComponentRef = componentRef;
 

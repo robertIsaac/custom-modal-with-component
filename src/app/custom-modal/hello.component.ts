@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { DialogConfig } from './dialog-config';
 import { DialogRef } from './dialog-ref';
 
 @Component({
+  standalone: true,
   selector: 'hello',
   template: `
     <div class="text-wrapper">
